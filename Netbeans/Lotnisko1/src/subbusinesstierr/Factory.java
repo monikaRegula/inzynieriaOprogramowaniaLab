@@ -53,25 +53,23 @@ public class Factory {
     }
            
     
+    
     public Ticket createTicket(Flight flight){
         Ticket ticket = new Ticket();
         double defaultPrice = 200;
-        int nr = flight.getPlaneNumber();
-        ticket.setFlightNumber(String.valueOf(nr));
+        ticket.setFlight(flight);
         ticket.setIsAvailable(true); //default value
         ticket.setPrice(defaultPrice);
         return ticket;
-    }
-   
+ }
     
+          
     public Purchase createPurchase(String[] data){
         Purchase purchase = new Purchase();
-        purchase.setFlighNumber(data[0]);
         purchase.setPurchaseStatus(Boolean.getBoolean(data[1]));
         return purchase;
-    }
-            
-            
+ }
+   
            
    
 }

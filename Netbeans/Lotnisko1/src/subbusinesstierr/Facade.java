@@ -5,6 +5,7 @@
  */
 package subbusinesstierr;
 
+import java.time.LocalTime;
 import subbusinesstier.entities.Flight;
 import subbusinesstier.entities.Ticket;
 import java.util.ArrayList;
@@ -24,19 +25,18 @@ public class Facade {
         clients = new ArrayList<>();
     }
     
-   
-    public String addFlightToList(String[] data){
-        System.out.println("Creating new flight .....");
+      
+    public String addFlightToList(String[] data) {
         Factory factory = new Factory();
         Flight flight = factory.createFlight(data);
-      if(searchFlight(flight) == null){
-           this.flights.add(flight);
-        //default value for ticket is 200
-           flight.addTickets();
-       }
-       return flight.toString();
+        if (searchFlight(flight) == null) {
+        this.flights.add(flight);
+        flight.addTickets();
+        return flight.toString();
+        }
+        return "Nie wstawiono lotu";
     }
-   
+
     
     public Flight searchFlight(Flight flight){
    int idx;
@@ -77,19 +77,8 @@ public class Facade {
        
     }
   
-    public String addClientToList(String[] data){
-        Factory factory = new Factory();
-        Client client = factory.createClient(data);
-        System.out.println("Creating new client .....");
-        if(searchClient(client) == null){
-           this.clients.add(client);
-        }
-        return client.toString();
-    }
-   
     
- 
-    public Client searchClient(Client client){
+     public Client searchClient(Client client){
        int idx;
         if ((idx = clients.indexOf(client)) != -1) {
             client = clients.get(idx);
@@ -100,7 +89,7 @@ public class Facade {
      
   
     public Client changeRegistrationStatus(String[] data){
-         Factory factory = new Factory();
+        Factory factory = new Factory();
         Client client = factory.createClient(data);
         if(searchClient(client) != null){
             client.setRegistrationStatus(true);
@@ -109,42 +98,44 @@ public class Facade {
         return null;
     }
     
-    
-    
-    public void searchAvailableTicketsForFlight(String[] data){
+    public String searchAvailableTicketsForFlight(String[] data) {
         Factory factory = new Factory();
-        Flight help = factory.createFlight(data);
-        if(searchFlight(help)!= null){
-            help.printAvilableTickets();
-        }
+        Flight help = factory.createFlight(data), existflight;
+        if ((existflight = searchFlight(help)) != null) {
+        return existflight.modelTickets(); }
+        return "Brak lotu";
     }
+
     
-    
-    public String addPurchase(String [] flightData, String[] ticketData, String[] clientData,String[] purchaseData){
+    public String addPurchase(String[] flightData, String[] clientData, String[] purchaseData) {
         Factory factory = new Factory();
-        Flight flight = factory.createFlight(flightData),existFlight;
-        Ticket ticket = factory.createTicket(flight),existTicket;
-        Client client = factory.createClient(clientData),existClient;
-        
-        if((existFlight = searchFlight(flight))!= null){
-            if((existTicket = existFlight.searchTicket(ticket))!= null){
-                if((existClient = searchClient(client))!= null){
-                    client.addPurchase(purchaseData);
-                    //czy jak ustawie dla bieltu klienta to 
-                    //klasa klient widzi ten bilet???
-                    if((existTicket = client.searchTicket(ticket)) != null){
-                     existTicket.setClient(client);
-                };
-                   
-                }
+        Flight flight = factory.createFlight(flightData), existFlight;
+        Client client = factory.createClient(clientData), existClient;
+        if ((existClient = searchClient(client)) != null) {
+        if ((existFlight = searchFlight(flight)) != null) {
+        return existFlight.addPurchase(existClient, purchaseData);
         }
-        return client.toString();
-          }
-        return null;
-    }
-    
-    
-        public void changePurchaseStatus(String[] flightData, String[] clientData, String[] purchaseData){
+        return "No such flight";
+        }
+        return "No such client";
+        }
+
+    //Modyfikować można liczbę dostępnych miejsc ale wtedy problem przy addTickets bo to w pętli 
+    //generuje bilety i zapomina o tych starych biletach przed modyfikacją
+      public String modifyFlight(String[] oldFlight, String[] newFlight) {
+        Factory factory = new Factory();
+        Flight toChange = factory.createFlight(oldFlight), exist;
+        if (!this.flights.remove(toChange)) // szuka i usuwa, jesli znajdzie!!!
+        {
+        return "Brak modfyfikowanego lotu";
+        }
+        return this.addFlightToList(newFlight); //dodaje nowy lot, czyli sprawdza, czy to nowy lot i
+        // dodaje, jesli jest nowy po zmianach
+        }
+       
+      
+       
+        public String changePurchaseStatus(String[] flightData, String[] clientData, String[] purchaseData){
          Factory f = new Factory();
          Client client = f.createClient(clientData),existClient;
          Purchase purchase = f.createPurchase(purchaseData),existPurchase;
@@ -161,29 +152,88 @@ public class Facade {
                  client.getPurchases().remove(purchase);
              }
          }
+         return client.toString();
         
     }
+ 
+
+    public String registerClient(String[] data) {
+        Factory factory = new Factory();
+        Client client = factory.createClient(data);
+        if (searchClient(client) == null) {
+        this.clients.add(client);
+        return client.toString();
+        } else {
+        return "Klient już istnieje w bazie!!!";
+        }
+    }
     
-    
+
      public static void main(String[] args) {
-        Facade facade = new Facade();
-        //creating client
-        String [] exampleClient = {"Monika","Reguła","monikaregula@gmail.com"};
-        facade.addClientToList(exampleClient);
-        System.out.println(facade.printClients());
-        //creating flight
-        String[] exampleFlight = {"2","4","2019","Frankfurt","144","5","19","45"};
-        facade.addFlightToList(exampleFlight);
-       
-        System.out.println(facade.printFligths());;
-        //printing all available tickets:
-         facade.searchAvailableTicketsForFlight(exampleFlight);
-         //nie pokazuje biletów!!!! dlaczego ich nie widzi fasada
-         
-        
-     
-        
-     
-    }
-     
+       Facade facade = new Facade();
+
+ String[] exampleClient1 = {"Monika", "Reguła", "monikaregula@gmail.com"};
+ String[] exampleClient2 = {"Katarzyna", "Jurkowska", "katarzynajurkowska@gmail.com"};
+ System.out.println("Creating new client .....");
+ System.out.println(facade.registerClient(exampleClient1));
+ System.out.println("Creating new client .....");
+ System.out.println(facade.registerClient(exampleClient2));
+ System.out.println("Creating existing client .....");
+ System.out.println(facade.registerClient(exampleClient1));
+ System.out.println("\nKlienci .....");
+ System.out.println(facade.printClients());
+
+ //nowe loty
+ String[] exampleFlight1 = {"2", "4", "2019", "Frankfurt", "144", "5", "19", "45"};
+ String[] exampleFlight2 = {"8", "4", "2019", "Frankfurt", "144", "5", "19", "45"};
+ System.out.println("Creating new flight .....");
+ System.out.println(facade.addFlightToList(exampleFlight1));
+ System.out.println("Creating new flight .....");
+ System.out.println(facade.addFlightToList(exampleFlight2));
+ System.out.println("Creating existing flight .....");
+ System.out.println(facade.addFlightToList(exampleFlight1));
+ //pokazuj wszytskie dostępne loty:
+ System.out.println("\nLoty .....");
+ System.out.println(facade.printFligths());
+ 
+ 
+ //wyszukiwanie dostępnych biletów dla konkretnego lotu
+ System.out.println("\n Available Tickets for flight1.....");
+ System.out.println(facade.searchAvailableTicketsForFlight(exampleFlight1));
+ System.out.println("\n Available Tickets for flight2.....");
+ System.out.println(facade.searchAvailableTicketsForFlight(exampleFlight2));
+ 
+ String[] examplePurchase1 = {"144", "A1"};
+ String[] examplePurchase2 = {"144", "A2"};
+ String[] examplePurchase3 = {"144", "A3"};
+ String[] examplePurchase4 = {"144", "A4"};
+ String[] examplePurchase5 = {"144", "A5"};
+ String[] examplePurchase6 = {"144", "A5"};
+ //dodaje zamówienie klienta:
+ System.out.println("dodaj zamówienie: " + facade.addPurchase(exampleFlight1, exampleClient1, examplePurchase1));
+ System.out.println("dodaj zamówienie: " + facade.addPurchase(exampleFlight1, exampleClient1, examplePurchase2));
+ System.out.println("dodaj zamówienie: " + facade.addPurchase(exampleFlight1, exampleClient1, examplePurchase3));
+ System.out.println("dodaj zamówienie: " + facade.addPurchase(exampleFlight1, exampleClient1, examplePurchase4));
+ System.out.println("dodaj zamówienie: " + facade.addPurchase(exampleFlight1, exampleClient1, examplePurchase5));
+ System.out.println("dodaj zamówienie: " + facade.addPurchase(exampleFlight1, exampleClient1, examplePurchase6));
+
+ System.out.println("\n No available Tickets for flight1.....");
+ System.out.println(facade.searchAvailableTicketsForFlight(exampleFlight1));
+ System.out.println("\n Available Tickets for flight2.....");
+ System.out.println(facade.searchAvailableTicketsForFlight(exampleFlight2));
+ System.out.println("\n State of flights.....");
+ System.out.println(facade.printFligths()); 
+ System.out.println("\n State of flights.....");
+ System.out.println(facade.printFligths());
+ 
+System.out.println("\n State of flights.....");
+System.out.println(facade.printFligths());
+ //modyfikuj lot
+ String[] exampleFlight3 = {"2", "4", "2019", "Frankfurt", "144", "5", "21", "30"};
+ System.out.println("\n State of flights after modification.....");
+ facade.modifyFlight(exampleFlight1, exampleFlight1);
+ System.out.println(facade.printFligths());
+ System.out.println(facade.searchAvailableTicketsForFlight(exampleFlight1));
+
+    } 
 }

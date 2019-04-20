@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import subbusinesstierr.Factory;
 
 /**
@@ -74,16 +75,46 @@ public class Flight {
         return tickets;
     }
 
-    
-   @Override
-   public String toString(){
-       String result = "FLIGHT: Lot: " + getDate();
-       result += " Godzina: " + getHour();
-       result += " Destynacja: "+getDestination();
-       result += " Liczba miejsc: " + getNumberOfSeats();
-       result += " Nr samolotu: "+getPlaneNumber();
-       return result; 
-   }
+     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+        return true;
+        }
+        if (obj == null) {
+        return false;
+        }
+        if (getClass() != obj.getClass()) {
+     return false;
+        }
+    final Flight other = (Flight) obj;
+        if (this.planeNumber != other.planeNumber) {
+        return false;
+        }
+    if (!Objects.equals(this.destination, other.destination)) {
+        return false;
+    }
+    if (!Objects.equals(this.date, other.date)) {
+        return false;
+    }
+    if (!Objects.equals(this.hour, other.hour)) {
+        return false;
+    }
+    if(!Objects.equals(this.numberOfSeats,other.numberOfSeats)){
+            return true;
+        }
+        return true;
+    }
+  
+      
+    @Override
+    public String toString(){
+        String result = "FLIGHT: Lot: " + getDate();
+        result += " Godzina: " + getHour();
+        result += " Destynacja: "+getDestination();
+        result += " Liczba miejsc: " + getNumberOfSeats();
+        result += " Nr samolotu: "+getPlaneNumber();
+        return result+ "\n"; 
+    }
     
    public String[] toString_() {
         String[] flightData = new String[5];
@@ -94,18 +125,17 @@ public class Flight {
         flightData[4] = String.valueOf(getPlaneNumber());
         return flightData;
     }
-   
-       
-    public ArrayList<Ticket> addTickets(){ 
-       Factory f = new Factory();
-       Ticket ticket = f.createTicket(this);
-       for (int i = 1;i<this.getNumberOfSeats()+1;i++){
-           ticket.setSeat("A"+String.valueOf(i));
-           tickets.add(ticket);
-       }
-       return tickets;
-   }
+  
     
+    public void addTickets(){
+        Factory f = new Factory();
+        for (int i = 1;i<this.getNumberOfSeats()+1;i++){
+        Ticket ticket = f.createTicket(this); //kazdy nowy bilet, utworzony przez fabryke zna swój lot
+        ticket.setSeat("A"+String.valueOf(i));
+        tickets.add(ticket);
+        }
+ 
+        }
      public Ticket searchTicket(Ticket ticket){
        int idx;
         if ((idx = tickets.indexOf(ticket)) != -1) {
@@ -115,22 +145,37 @@ public class Flight {
         return null;
     }
    
+     public String modelTickets(){   
+        return tickets.toString(); }
      
-public void printAvilableTickets(){
+     
+     public String addPurchase(Client client, String [] purchaseData) {
+        Factory factory = new Factory();
+        Ticket ticket = factory.createTicket(this), existTicket;
+        ticket.setSeat(purchaseData[1]);
+        if((existTicket=this.searchTicket(ticket))!=null){
+          return client.addPurchase(existTicket,purchaseData);
+        }
+        return "Brak wolnego biletu";
+     }
+     
+    public void printAvilableTickets(){
             Flight flight = this;
-           flight.getTickets().stream().
-           filter(a-> a.isIsAvailable() == true).
-           forEach(System.out::println);         
-}
+           flight.getTickets().stream()
+           .filter(a-> a.isIsAvailable() == true)
+           .forEach(System.out::println);         
+    }
 
 
-public void printAllTickets(Flight flight){
+    public void printAllTickets(Flight flight){
            flight.getTickets().stream().
            forEach(System.out::println);
            System.out.println(flight.tickets.toString());
-}
+    }
 
 
-
+    public void modifyNumberOfSeats()
+    { --this.numberOfSeats; }
      
+    
 }

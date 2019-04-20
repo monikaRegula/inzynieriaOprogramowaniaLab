@@ -6,6 +6,7 @@
 package subbusinesstier.entities;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import subbusinesstierr.Factory;
 
 
@@ -90,12 +91,34 @@ public class Client {
         this.tickets = tickets;
     }
 
- 
+ @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+    return true;
+    }
+    if (obj == null) {
+    return false;
+    }
+    if (getClass() != obj.getClass()) {
+    return false;
+    }
+    final Client other = (Client) obj;
+    if (!Objects.equals(this.name, other.name)) {
+    return false;
+    }
+    if (!Objects.equals(this.lastName, other.lastName)) {
+    return false;
+    }
+    if (!Objects.equals(this.mail, other.mail)) {
+    return false;
+    }
+     return true;
+    }
     
      @Override
    public String toString(){
        return  "CLIENT: " + getName() + " "+ getLastName()+
-       " mail: " + getMail()+" Nr lotu: "+ getFlightNumber()+
+               " mail: " + getMail()+" Nr lotu: "+ getFlightNumber()+
                " Status rejestracji:"+showRegistrationStatus(registrationStatus)+
                " Status Zamówienia:"+ showPurchaseStatus(clientPurchaseStatus)
                + "\nCLIENTS PURCHASES: " + purchases.toString()+"\n";
@@ -134,20 +157,34 @@ public class Client {
                   "\nStatus zamówienia:"+showPurchaseStatus(clientPurchaseStatus);
       }
       
+      public String addPurchase(Ticket ticket, String[] purchaseData) {
+        Factory factory = new Factory();
+        ticket.setIsAvailable(false);
+        Purchase purchase = factory.createPurchase(purchaseData);
+        purchase.setTicket(ticket);
+        if ((searchPurchase(purchase)) == null) {
+        setClientPurchaseStatus(true);
+        purchase.setPurchaseStatus(clientPurchaseStatus);
+        purchases.add(purchase);
+        ticket.modifyNumberOfSeats();
+        tickets.add(ticket);
+        return toString(); }
+        return "Nie dodano sprzedazy"; }
       
-      public String addPurchase(String[] purchaseData){
-          Factory factory = new Factory();
-          Purchase purchase = factory.createPurchase(purchaseData);
-          if((purchase = searchPurchase(purchase)) != null){
-              setClientPurchaseStatus(true);
-              this.purchases.add(purchase);
-              //dodoaj bilet do klienta
-              
-          }
-            return null;
-      }
       
-   
+//      public String addPurchase(String[] purchaseData){
+//          Factory factory = new Factory();
+//          Purchase purchase = factory.createPurchase(purchaseData);
+//          if((purchase = searchPurchase(purchase)) != null){
+//              setClientPurchaseStatus(true);
+//              this.purchases.add(purchase);
+//              //dodoaj bilet do klienta
+//              
+//          }
+//            return null;
+//      }
+//      
+//   
     public Purchase searchPurchase(Purchase purchase) {
         int idx;
         if ((idx = purchases.indexOf(purchase)) != -1) {
@@ -166,6 +203,8 @@ public class Client {
         }
       return null;
     }
+
+   
     
     }
     
