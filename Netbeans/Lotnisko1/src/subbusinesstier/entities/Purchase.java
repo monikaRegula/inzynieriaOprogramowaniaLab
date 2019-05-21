@@ -1,24 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package subbusinesstier.entities;
 
 import java.util.Objects;
 
-/**
- *
- * @author asus
- */
+
 public class Purchase {
     private String flighNumber;
     private boolean purchaseStatus;
     private Ticket ticket;
+    private int numberTest;
     
     public Purchase() {
     }
 
+
+    public Purchase(int numberTest,String[] dataPurchase) {
+        this.numberTest = numberTest;
+        this.purchaseStatus=(Boolean.getBoolean(dataPurchase[1]));
+       
+    }
+
+    
     public String getFlighNumber() {
         return flighNumber;
     }

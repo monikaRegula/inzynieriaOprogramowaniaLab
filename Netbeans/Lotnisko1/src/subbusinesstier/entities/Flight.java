@@ -18,18 +18,36 @@ import subbusinesstierr.Factory;
  * @author asus
  */
 public class Flight {
+
     private LocalDate date;
     private LocalTime hour;
     private int planeNumber;
     private String destination;
     private int numberOfSeats;
     private ArrayList<Ticket> tickets;
+    private int numberTest;
 
-   
     public Flight() {
         tickets = new ArrayList<>();
     }
-    
+
+    public Flight(int numberTest, String[] table) {
+        this.numberTest = numberTest;
+        int day = Integer.parseInt(table[0]);
+        int month = Integer.parseInt(table[1]);
+        int year = Integer.parseInt(table[2]);
+        LocalDate date = LocalDate.of(year, month, day);
+        this.date = date;
+        this.destination = table[3];
+        this.planeNumber = (Integer.parseInt(table[4]));
+        this.numberOfSeats = (Integer.parseInt(table[5]));
+        int hour = Integer.parseInt(table[6]);
+        int minute = Integer.parseInt(table[7]);
+        this.hour = (LocalTime.of(hour, minute));
+        tickets = new ArrayList<>();
+    }
+
+   
 
     public LocalDate getDate() {
         return date;
@@ -75,48 +93,47 @@ public class Flight {
         return tickets;
     }
 
-     @Override
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
-        return true;
+            return true;
         }
         if (obj == null) {
-        return false;
+            return false;
         }
         if (getClass() != obj.getClass()) {
-     return false;
+            return false;
         }
-    final Flight other = (Flight) obj;
+        final Flight other = (Flight) obj;
         if (this.planeNumber != other.planeNumber) {
-        return false;
+            return false;
         }
-    if (!Objects.equals(this.destination, other.destination)) {
-        return false;
-    }
-    if (!Objects.equals(this.date, other.date)) {
-        return false;
-    }
-    if (!Objects.equals(this.hour, other.hour)) {
-        return false;
-    }
-    if(!Objects.equals(this.numberOfSeats,other.numberOfSeats)){
+        if (!Objects.equals(this.destination, other.destination)) {
+            return false;
+        }
+        if (!Objects.equals(this.date, other.date)) {
+            return false;
+        }
+        if (!Objects.equals(this.hour, other.hour)) {
+            return false;
+        }
+        if (!Objects.equals(this.numberOfSeats, other.numberOfSeats)) {
             return true;
         }
         return true;
     }
-  
-      
+
     @Override
-    public String toString(){
+    public String toString() {
         String result = "FLIGHT: Lot: " + getDate();
         result += " Godzina: " + getHour();
-        result += " Destynacja: "+getDestination();
+        result += " Destynacja: " + getDestination();
         result += " Liczba miejsc: " + getNumberOfSeats();
-        result += " Nr samolotu: "+getPlaneNumber();
-        return result+ "\n"; 
+        result += " Nr samolotu: " + getPlaneNumber();
+        return result + "\n";
     }
-    
-   public String[] toString_() {
+
+    public String[] toString_() {
         String[] flightData = new String[5];
         flightData[0] = String.valueOf(getDate());
         flightData[1] = String.valueOf(getHour());
@@ -125,57 +142,55 @@ public class Flight {
         flightData[4] = String.valueOf(getPlaneNumber());
         return flightData;
     }
-  
-    
-    public void addTickets(){
+
+    public void addTickets() {
         Factory f = new Factory();
-        for (int i = 1;i<this.getNumberOfSeats()+1;i++){
-        Ticket ticket = f.createTicket(this); //kazdy nowy bilet, utworzony przez fabryke zna swój lot
-        ticket.setSeat("A"+String.valueOf(i));
-        tickets.add(ticket);
+        for (int i = 1; i < this.getNumberOfSeats() + 1; i++) {
+            Ticket ticket = f.createTicket(this); //kazdy nowy bilet, utworzony przez fabryke zna swój lot
+            ticket.setSeat("A" + String.valueOf(i));
+            tickets.add(ticket);
         }
- 
-        }
-     public Ticket searchTicket(Ticket ticket){
-       int idx;
+
+    }
+
+    public Ticket searchTicket(Ticket ticket) {
+        int idx;
         if ((idx = tickets.indexOf(ticket)) != -1) {
             ticket = tickets.get(idx);
             return ticket;
         }
         return null;
     }
-   
-     public String modelTickets(){   
-        return tickets.toString(); }
-     
-     
-     public String addPurchase(Client client, String [] purchaseData) {
+
+    public String modelTickets() {
+        return tickets.toString();
+    }
+
+    public String addPurchase(Client client, String[] purchaseData) {
         Factory factory = new Factory();
         Ticket ticket = factory.createTicket(this), existTicket;
         ticket.setSeat(purchaseData[1]);
-        if((existTicket=this.searchTicket(ticket))!=null){
-          return client.addPurchase(existTicket,purchaseData);
+        if ((existTicket = this.searchTicket(ticket)) != null) {
+            return client.addPurchase(existTicket, purchaseData);
         }
         return "Brak wolnego biletu";
-     }
-     
-    public void printAvilableTickets(){
-            Flight flight = this;
-           flight.getTickets().stream()
-           .filter(a-> a.isIsAvailable() == true)
-           .forEach(System.out::println);         
     }
 
-
-    public void printAllTickets(Flight flight){
-           flight.getTickets().stream().
-           forEach(System.out::println);
-           System.out.println(flight.tickets.toString());
+    public void printAvilableTickets() {
+        Flight flight = this;
+        flight.getTickets().stream()
+                .filter(a -> a.isIsAvailable() == true)
+                .forEach(System.out::println);
     }
 
+    public void printAllTickets(Flight flight) {
+        flight.getTickets().stream().
+                forEach(System.out::println);
+        System.out.println(flight.tickets.toString());
+    }
 
-    public void modifyNumberOfSeats()
-    { --this.numberOfSeats; }
-     
-    
+    public void modifyNumberOfSeats() {
+        --this.numberOfSeats;
+    }
+
 }

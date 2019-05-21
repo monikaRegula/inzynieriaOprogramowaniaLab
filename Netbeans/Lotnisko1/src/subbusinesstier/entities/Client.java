@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Objects;
 import subbusinesstierr.Factory;
 
-
 /**
  *
  * @author asus
  */
 public class Client {
+
     private String name;
     private String lastName;
     private String mail;
@@ -23,14 +23,24 @@ public class Client {
     private boolean clientPurchaseStatus;
     private ArrayList<Purchase> purchases;
     private ArrayList<Ticket> tickets;
-  
-    
+    private int numberTest;
+
     public Client() {
         purchases = new ArrayList<>();
         tickets = new ArrayList<>();
     }
 
-    
+    public Client(int numberTest, String[] table) {
+        this.numberTest = numberTest;
+        this.name = table[0];
+        this.lastName = table[1];
+        this.mail = table[2];
+        this.registrationStatus = false;
+        this.clientPurchaseStatus = (false);
+        purchases = new ArrayList<>();
+        tickets = new ArrayList<>();
+    }
+
     public String getName() {
         return name;
     }
@@ -91,41 +101,40 @@ public class Client {
         this.tickets = tickets;
     }
 
- @Override
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
-    return true;
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Client other = (Client) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.lastName, other.lastName)) {
+            return false;
+        }
+        if (!Objects.equals(this.mail, other.mail)) {
+            return false;
+        }
+        return true;
     }
-    if (obj == null) {
-    return false;
+
+    @Override
+    public String toString() {
+        return "CLIENT: " + getName() + " " + getLastName()
+                + " mail: " + getMail() + " Nr lotu: " + getFlightNumber()
+                + " Status rejestracji:" + showRegistrationStatus(registrationStatus)
+                + " Status Zamówienia:" + showPurchaseStatus(clientPurchaseStatus)
+                + "\nCLIENTS PURCHASES: " + purchases.toString() + "\n";
     }
-    if (getClass() != obj.getClass()) {
-    return false;
-    }
-    final Client other = (Client) obj;
-    if (!Objects.equals(this.name, other.name)) {
-    return false;
-    }
-    if (!Objects.equals(this.lastName, other.lastName)) {
-    return false;
-    }
-    if (!Objects.equals(this.mail, other.mail)) {
-    return false;
-    }
-     return true;
-    }
-    
-     @Override
-   public String toString(){
-       return  "CLIENT: " + getName() + " "+ getLastName()+
-               " mail: " + getMail()+" Nr lotu: "+ getFlightNumber()+
-               " Status rejestracji:"+showRegistrationStatus(registrationStatus)+
-               " Status Zamówienia:"+ showPurchaseStatus(clientPurchaseStatus)
-               + "\nCLIENTS PURCHASES: " + purchases.toString()+"\n";
-   }
-    
-   
-   public String[] toString_() {
+
+    public String[] toString_() {
         String[] clientData = new String[5];
         clientData[0] = String.valueOf(getName());
         clientData[1] = String.valueOf(getLastName());
@@ -135,77 +144,66 @@ public class Client {
         clientData[5] = String.valueOf(isClientPurchaseStatus());
         return clientData;
     }
-    
-     public String showPurchaseStatus(boolean status){
-         if(status){
-                    return "OPŁACONY";
-                }else{
-                    return "NIEOPŁACONY";
-                }
+
+    public String showPurchaseStatus(boolean status) {
+        if (status) {
+            return "OPŁACONY";
+        } else {
+            return "NIEOPŁACONY";
+        }
     }
-     
-      public String showRegistrationStatus(boolean status){
-         if(status){
-                    return "ZAREJESTROWANY";
-                }else{
-                    return "NIEZAREJESTROWANY";
-                }
+
+    public String showRegistrationStatus(boolean status) {
+        if (status) {
+            return "ZAREJESTROWANY";
+        } else {
+            return "NIEZAREJESTROWANY";
+        }
     }
-      
-      public String showClientsPurchase(Purchase purchase){
-          return "Nr lotu: "+purchase.getFlighNumber() +
-                  "\nStatus zamówienia:"+showPurchaseStatus(clientPurchaseStatus);
-      }
-      
-      public String addPurchase(Ticket ticket, String[] purchaseData) {
+
+    public String showClientsPurchase(Purchase purchase) {
+        return "Nr lotu: " + purchase.getFlighNumber()
+                + "\nStatus zamówienia:" + showPurchaseStatus(clientPurchaseStatus);
+    }
+
+    public String addPurchase(Ticket ticket, String[] purchaseData) {
         Factory factory = new Factory();
         ticket.setIsAvailable(false);
         Purchase purchase = factory.createPurchase(purchaseData);
         purchase.setTicket(ticket);
         if ((searchPurchase(purchase)) == null) {
-        setClientPurchaseStatus(true);
-        purchase.setPurchaseStatus(clientPurchaseStatus);
-        purchases.add(purchase);
-        ticket.modifyNumberOfSeats();
-        tickets.add(ticket);
-        return toString(); }
-        return "Nie dodano sprzedazy"; }
-      
-      
-//      public String addPurchase(String[] purchaseData){
-//          Factory factory = new Factory();
-//          Purchase purchase = factory.createPurchase(purchaseData);
-//          if((purchase = searchPurchase(purchase)) != null){
-//              setClientPurchaseStatus(true);
-//              this.purchases.add(purchase);
-//              //dodoaj bilet do klienta
-//              
-//          }
-//            return null;
-//      }
-//      
-//   
+            setClientPurchaseStatus(true);
+            purchase.setPurchaseStatus(clientPurchaseStatus);
+            purchases.add(purchase);
+            ticket.modifyNumberOfSeats();
+            tickets.add(ticket);
+            return toString();
+        }
+        return "Nie dodano sprzedazy";
+    }
+
+
     public Purchase searchPurchase(Purchase purchase) {
         int idx;
         if ((idx = purchases.indexOf(purchase)) != -1) {
             purchase = purchases.get(idx);
-            return purchase ;
+            return purchase;
         }
         return null;
     }
-   
-    
-    public Ticket searchTicket(Ticket ticket ){
+
+    public Ticket searchTicket(Ticket ticket) {
         int idx;
         if ((idx = tickets.indexOf(ticket)) != -1) {
-            ticket =tickets.get(idx);
+            ticket = tickets.get(idx);
             return ticket;
         }
-      return null;
+        return null;
     }
 
-   
-    
+    public String removePurchase(Purchase purchase) {
+        getPurchases().remove(purchase);
+        return "REMOVED: "+purchase.toString();
     }
-    
 
+}

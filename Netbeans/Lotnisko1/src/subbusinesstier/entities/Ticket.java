@@ -19,10 +19,22 @@ public class Ticket extends Flight{
    private boolean isAvailable;
    private Client client;
    private Flight flight;
+   private int numberTest;
 
     public Ticket() {
     }
+
+
+    public Ticket(int numberTest,Flight flight) {
+        this.price = 200;
+        this.flight = flight;
+        this.isAvailable= (true); //default value
+       this.numberTest = numberTest;
+       this.client = client;
+      
+    }
    
+    
 
     public String getSeat() {
         return seat;

@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import subbusinesstier.entities.Flight;
 import subbusinesstier.entities.Ticket;
 import java.util.ArrayList;
+import java.util.List;
 import subbusinesstier.entities.Client;
 import subbusinesstier.entities.Purchase;
 
@@ -17,13 +18,23 @@ import subbusinesstier.entities.Purchase;
  * @author asus
  */
 public class Facade {
-    ArrayList<Flight> flights;
-    ArrayList<Client> clients;
+    List<Flight> flights;
+    List<Client> clients;
    
     public Facade() {
         flights = new ArrayList<>();
         clients = new ArrayList<>();
     }
+    
+
+    public List<Flight> getFlights() {
+        return flights;
+    }
+
+    public List<Client> getClients() {
+        return clients;
+    }
+    
     
       
     public String addFlightToList(String[] data) {
@@ -46,7 +57,7 @@ public class Facade {
         }
         return null;
     }
-    
+   /* 
     public Object[][] getFlights() {
         Object[][] flightsList = new Object[flights.size()][];
         int i = 0;
@@ -56,6 +67,15 @@ public class Facade {
         return flightsList;
     }
      
+     public Object[][] getClients() {
+        Object[][] clientsList = new Object[clients.size()][];
+        int i = 0;
+        for (Client next : clients) {
+            clientsList[i++] = next.toString_();
+        }
+        return clientsList;
+    }
+    */
     public String printFligths() {
         String help = "";
         for (Flight f : flights) {
@@ -149,7 +169,7 @@ public class Facade {
                 Ticket change = client.searchTicket(create);
                  change.setIsAvailable(true);
                  //usuń zamowienie
-                 client.getPurchases().remove(purchase);
+                 client.removePurchase(purchase);
              }
          }
          return client.toString();
